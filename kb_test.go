@@ -22,12 +22,17 @@ func TestSimpleQuery(t *testing.T) {
 	kb := NewKB()
 	kb.AddFact("saml", "likes", "coffee")
 
+	i := 0
 	results := kb.Q("saml", "likes", "?")
 	for result := range results {
 		expected := "coffee"
 		if result.O != expected {
 			t.Errorf("Wrong result in TestSimpleQuery. Exepcted %s but found %s", expected, result.O)
 		}
+		i++
+	}
+	if i == 0 {
+		t.Errorf("No results returned from query!")
 	}
 }
 
@@ -40,4 +45,29 @@ func ExampleQuery() {
 	}
 	// Output:
 	// {saml likes coffee}
+}
+
+func TestPatternRule(t *testing.T) {
+	kb := NewKB()
+	kb.AddFact("tea", "tastes", "soso")
+	kb.AddFact("coffee", "tastes", "great")
+	kb.AddFact("water", "tastes", "great")
+	kb.AddFact("coffee", "contains", "caffeine")
+	kb.AddFact("tea", "contains", "caffeine")
+
+	kb.AddPatternRule(Triple{"saml", "likes", "?o"},
+		Triple{"?o", "tastes", "great"},
+		Triple{"?o", "contains", "caffeine"})
+
+	expected := Triple{"saml", "likes", "coffee"}
+	i := 0
+	for tr := range kb.Q("saml", "likes", "?") {
+		if tr != expected {
+			t.Errorf("Expected %v but found %v\n", expected, tr)
+		}
+		i++
+	}
+	if i == 0 {
+		t.Errorf("No results returned from query!")
+	}
 }
