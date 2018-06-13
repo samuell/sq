@@ -22,8 +22,9 @@ type KB struct {
 	goRules      map[Triple]func(kb *KB, tr Triple) TripleChan
 }
 
-func (kb *KB) AddFact(triple Triple) {
-	kb.facts[triple] = triple
+func (kb *KB) AddFact(s string, p string, o string) {
+	tr := Triple{s, p, o}
+	kb.facts[tr] = tr
 }
 
 func (kb *KB) AddPatternRule(triplePattern Triple, trs ...Triple) {

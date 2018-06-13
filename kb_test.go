@@ -1,6 +1,7 @@
 package sq
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -19,7 +20,7 @@ func TestNewKB(t *testing.T) {
 
 func TestSimpleQuery(t *testing.T) {
 	kb := NewKB()
-	kb.AddFact(Triple{"saml", "likes", "coffee"})
+	kb.AddFact("saml", "likes", "coffee")
 
 	results := kb.Q("saml", "likes", "?")
 	for result := range results {
@@ -28,4 +29,15 @@ func TestSimpleQuery(t *testing.T) {
 			t.Errorf("Wrong result in TestSimpleQuery. Exepcted %s but found %s", expected, result.O)
 		}
 	}
+}
+
+func ExampleQuery() {
+	kb := NewKB()
+	kb.AddFact("saml", "likes", "coffee")
+	kb.AddFact("saml", "lives_in", "sweden")
+	for res := range kb.Q("saml", "likes", "?") {
+		fmt.Println(res)
+	}
+	// Output:
+	// {saml likes coffee}
 }
